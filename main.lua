@@ -30,8 +30,8 @@ function love.load()
     do_once = false
 
     screen = {}
-    screen.quality = 256
-    screen.cellSize = 3
+    screen.quality = 1
+    screen.cellSize = 768
 
     screen.range = 0.01
     screen.colors = {
@@ -89,6 +89,21 @@ function love.update(dt)
             screen[y][x] = noise
         end
     end
+
+    if screen.quality <= 1 then
+        screen.quality = 1
+        screen.cellSize = 768
+    end
+end
+
+function love.keypressed(k)
+    if k == "r" then
+        screen.quality = screen.quality / 2
+        screen.cellSize = screen.cellSize * 2
+    elseif k == "t" then
+        screen.quality = screen.quality * 2
+        screen.cellSize = screen.cellSize / 2
+    end
 end
 
 function love.draw()
@@ -115,10 +130,10 @@ function love.draw()
     -- Title, Credits, Pixels, Coordinates, Zoom, Quote
     love.graphics.print("Island Generator", 2*ww/3, wh/10)
     love.graphics.print("Made By AAOOII-RN and with Love", 2*ww/3, 2*wh/10)
-    love.graphics.print("# of Tiles & Tile Size: " .. screen.quality^2 .. ", " .. screen.cellSize, 2*ww/3, 3*wh/10)
+    love.graphics.print("Quality & Tile Size: " .. screen.quality .. ", " .. screen.cellSize, 2*ww/3, 3*wh/10)
     love.graphics.print("Coordinates: " .. math.floor(tx) .. ", " .. math.floor(ty), 2*ww/3, 4*wh/10)
     love.graphics.print("Zoom: " .. math.floor(screen.range*100), 2*ww/3, 5*wh/10)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 2*ww/3, 6*wh/10)
-    love.graphics.print("WASD to move, Q and E to zoom", 2*ww/3, 7*wh/10)
+    love.graphics.print("WASD to move, Q and E to zoom, R and T to change quality", 2*ww/3, 7*wh/10)
     love.graphics.print('"You may encounter an obvious pattern.\nRestart the program if you hate it"', 2*ww/3, 8*wh/10)
 end
