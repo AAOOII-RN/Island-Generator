@@ -30,11 +30,11 @@ function love.load()
     do_once = false
 
     screen = {}
-    screen.quality = 1
-    screen.cellSize = 768
+    screenQuality = 128
+    screenCellSize = 6
 
-    screen.range = 0.01
-    screen.colors = {
+    screenZoom = 0.01
+    screenColors = {
         {0.243, 0.729, 0.286},
         {1, 0.89, 0.89},
         {0, 0.761, 1},
@@ -44,65 +44,80 @@ function love.load()
 
     tx = 0
     ty = 0
+
+    before = 0
+    ticker = 0
 end
 
 
 function love.update(dt)
-    screen.range = math.max(screen.range, 0.005)
+    ticker = ticker + 1
+    screenZoom = math.max(screenZoom, 0.005)
     local kd = love.keyboard.isDown
-
+    
     -- TRAVEL
     if kd("w") then
         ty = ty + 10 * dt
     elseif kd("s") then
         ty = ty - 10 * dt
     end
-
+    
     if kd("a") then
         tx = tx + 10 * dt
     elseif kd("d") then
         tx = tx - 10 * dt
     end
-
+    
     -- ZOOM
-    if kd("q") then -- Zoom out
-        screen.range = screen.range + 0.1 * dt
-    elseif kd("e") then -- Zoom in
-        screen.range = screen.range - 0.1 * dt
+    if kd("u") then -- Zoom out
+        screenZoom = screenZoom - 0.1 * dt
+    elseif kd("i") then -- Zoom in
+        screenZoom = screenZoom + 0.1 * dt
     end
-
-    for y = 1, screen.quality do
+    
+    for y = 1, screenQuality do
         screen[y] = {}
-        for x = 1, screen.quality do
+        for x = 1, screenQuality do
             local a = hillNoise(
-                tx-screen.range*(x-screen.quality/2), -- Idk how either of these works...
-                ty-screen.range*(y-screen.quality/2),
+                tx-screenZoom*(x-screenQuality/2), -- Idk how either of these works...
+                ty-screenZoom*(y-screenQuality/2),
                 1
             )
             local b = hillNoise(
-                tx-screen.range*(x-screen.quality/2),
-                ty-screen.range*(y-screen.quality/2),
+                tx-screenZoom*(x-screenQuality/2),
+                ty-screenZoom*(y-screenQuality/2),
                 2
             )
-
+            
             noise =  a * b
             screen[y][x] = noise
         end
     end
-
-    if screen.quality <= 1 then
-        screen.quality = 1
-        screen.cellSize = 768
+    
+    if screenQuality <= 1 then
+        screenQuality = 1
+        screenCellSize = 768
+    end
+    
+    if ticker % 2 == 0 then -- delaying
+        before = screenQuality
     end
 end
 
 function love.keypressed(k)
-    if k == "r" then
-        screen.quality = screen.quality / 2
-        screen.cellSize = screen.cellSize * 2
-    elseif k == "t" then
-        screen.quality = screen.quality * 2
-        screen.cellSize = screen.cellSize / 2
+    if k == "o" then
+        screenQuality = screenQuality / 2
+        screenCellSize = screenCellSize * 2
+        screenZoom = screenZoom * 2
+    elseif k == "p" then
+        screenQuality = screenQuality * 2
+        screenCellSize = screenCellSize / 2
+        screenZoom = screenZoom / 2
+    end
+    if screenQuality ~= before then
+        for y = 1, screenQuality do
+            table.remove(screen,y)
+        end
     end
 end
 
@@ -111,18 +126,18 @@ function love.draw()
     for y, row in ipairs(screen) do
         for x, tile in ipairs(row) do
             if tile >= 0.25 then
-                love.graphics.setColor(screen.colors[1])
+                love.graphics.setColor(screenColors[1])
             elseif tile >= 0.2 then
-                love.graphics.setColor(screen.colors[2])
+                love.graphics.setColor(screenColors[2])
             elseif tile >= 0.125 then
-                love.graphics.setColor(screen.colors[3])
+                love.graphics.setColor(screenColors[3])
             elseif tile >= 0.025 then
-                love.graphics.setColor(screen.colors[4])
+                love.graphics.setColor(screenColors[4])
             else
-                love.graphics.setColor(screen.colors[5])
+                love.graphics.setColor(screenColors[5])
             end
 
-            love.graphics.rectangle("fill", x * screen.cellSize, y * screen.cellSize, screen.cellSize, screen.cellSize)
+            love.graphics.rectangle("fill", (x-1) * screenCellSize, (y-1) * screenCellSize, screenCellSize, screenCellSize)
         end
     end
 
@@ -130,10 +145,10 @@ function love.draw()
     -- Title, Credits, Pixels, Coordinates, Zoom, Quote
     love.graphics.print("Island Generator", 2*ww/3, wh/10)
     love.graphics.print("Made By AAOOII-RN and with Love", 2*ww/3, 2*wh/10)
-    love.graphics.print("Quality & Tile Size: " .. screen.quality .. ", " .. screen.cellSize, 2*ww/3, 3*wh/10)
+    love.graphics.print("Quality & Tile Size: " .. screenQuality .. ", " .. screenCellSize, 2*ww/3, 3*wh/10)
     love.graphics.print("Coordinates: " .. math.floor(tx) .. ", " .. math.floor(ty), 2*ww/3, 4*wh/10)
-    love.graphics.print("Zoom: " .. math.floor(screen.range*100), 2*ww/3, 5*wh/10)
+    love.graphics.print("Zoom: " .. math.floor(screenZoom*100), 2*ww/3, 5*wh/10)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 2*ww/3, 6*wh/10)
-    love.graphics.print("WASD to move, Q and E to zoom, R and T to change quality", 2*ww/3, 7*wh/10)
+    love.graphics.print("WASD to move, U and I to zoom, O and P to change quality", 2*ww/3, 7*wh/10)
     love.graphics.print('"You may encounter an obvious pattern.\nRestart the program if you hate it"', 2*ww/3, 8*wh/10)
 end
