@@ -15,3 +15,8 @@
 - U to zoom in, I to zoom out
 - O to decrease quality, P to increase quality
 ###### (The controls are meant for you to use both of your hands 😁😁)
+
+## Best Pics 📸
+![Idk what to name this, but it's an island](https://github.com/AAOOII-RN/Island-Generator/blob/main/Pictures/Idk.png)
+![Squiggly Isle](https://github.com/AAOOII-RN/Island-Generator/blob/main/Pictures/SquigglyIsle.png)
+![Zoomed Out](https://github.com/AAOOII-RN/Island-Generator/blob/main/Pictures/ZoomedOut.png)
