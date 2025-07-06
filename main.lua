@@ -6,7 +6,7 @@ function hillNoise(x, y, n)
             amp[j] = {}
             for i = 1, 6 do
                 offset[j][i] = math.random(-6000, 6000)/1000
-                amp[j][i] = math.random(750)/1000+0.25
+                amp[j][i] = math.random(1500)/1000-0.75
             end
         end
         do_once = true
@@ -134,15 +134,15 @@ function love.draw()
     for y, row in ipairs(screen) do
         for x, tile in ipairs(row) do
             if tile >= 0.25 then
-                love.graphics.setColor(screenColors[1])
-            elseif tile >= 0.2 then
-                love.graphics.setColor(screenColors[2])
-            elseif tile >= 0.125 then
-                love.graphics.setColor(screenColors[3])
-            elseif tile >= 0.025 then
-                love.graphics.setColor(screenColors[4])
+                love.graphics.setColor(screenColors[1]) -- Grass
+            elseif tile >= 0.20 then
+                love.graphics.setColor(screenColors[2]) -- Shore
+            elseif tile >= 0.17 then
+                love.graphics.setColor(screenColors[3]) -- Shallow water
+            elseif tile >= 0.11 then
+                love.graphics.setColor(screenColors[4]) -- Mid-water
             else
-                love.graphics.setColor(screenColors[5])
+                love.graphics.setColor(screenColors[5]) -- Deep water
             end
 
             love.graphics.rectangle("fill", (x-1) * screenCellSize, (y-1) * screenCellSize, screenCellSize, screenCellSize)
