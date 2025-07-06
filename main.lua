@@ -1,33 +1,11 @@
-function hillNoise(x, y, n)
-    math.randomseed(os.clock())
-    if not do_once then
-        for j = 1, randoms do
-            offset[j] = {}
-            amp[j] = {}
-            for i = 1, 6 do
-                offset[j][i] = math.random(-6000, 6000)/1000
-                amp[j][i] = math.random(1500)/1000-0.75
-            end
-        end
-        do_once = true
-    end
-
-    xv = {}
-    yv = {}
-    for i = 1, 6 do
-        xv[math.ceil(i/2)] = x*amp[n][math.ceil(i/2)*2-1]+offset[n][math.ceil(i/2)*2-1]
-        yv[math.ceil(i/2)] = y*amp[n][math.ceil(i/2)*2]+offset[n][math.ceil(i/2)*2]
-    end
-
-    return math.sin(xv[1] + yv[1] * 5^0.5/2) * math.sin(xv[2] - yv[2] * 3^0.5) * math.sin(xv[3] + yv[3] * 2^0.5)
-end
+Object = require "classic"
+require "hillNoise"
 
 function love.load()
+    math.randomseed(os.clock())
     ww, wh = love.window.getMode()
-    randoms = 3
-    offset = {}
-    amp = {}
-    do_once = false
+
+    hillnoise = Noise(3)
 
     screen = {}
     screenQuality = 128
@@ -41,6 +19,7 @@ function love.load()
         {0, 0.549, 1},
         {0, 0.416, 0.831}
     }
+    screenMode = 0
 
     tx = 0
     ty = 0
@@ -78,17 +57,17 @@ function love.update(dt)
     for y = 1, screenQuality do
         screen[y] = {}
         for x = 1, screenQuality do
-            local a = hillNoise(
+            local a = hillnoise:hillNoise(
                 tx-screenZoom*(x-screenQuality/2), -- Idk how either of these works...
                 ty-screenZoom*(y-screenQuality/2),
                 1
             )
-            local b = hillNoise(
+            local b = hillnoise:hillNoise(
                 tx-screenZoom*(x-screenQuality/2),
                 ty-screenZoom*(y-screenQuality/2),
                 2
             )
-            local c = hillNoise(
+            local c = hillnoise:hillNoise(
                 tx-screenZoom*(x-screenQuality/2),
                 ty-screenZoom*(y-screenQuality/2),
                 3
@@ -113,6 +92,9 @@ function love.update(dt)
 end
 
 function love.keypressed(k)
+    if k == "space" then
+        screenMode = math.fmod(screenMode + 1, 4)
+    end
     if k == "o" then
         screenQuality = screenQuality / 2
         screenCellSize = screenCellSize * 2
@@ -133,16 +115,28 @@ function love.draw()
     love.graphics.setBackgroundColor(0.1,0.1,0.1)
     for y, row in ipairs(screen) do
         for x, tile in ipairs(row) do
-            if tile >= 0.25 then
-                love.graphics.setColor(screenColors[1]) -- Grass
-            elseif tile >= 0.20 then
-                love.graphics.setColor(screenColors[2]) -- Shore
-            elseif tile >= 0.17 then
-                love.graphics.setColor(screenColors[3]) -- Shallow water
-            elseif tile >= 0.11 then
-                love.graphics.setColor(screenColors[4]) -- Mid-water
-            else
-                love.graphics.setColor(screenColors[5]) -- Deep water
+            if screenMode == 0 then
+                if tile >= 0.25 then
+                    love.graphics.setColor(screenColors[1]) -- Grass
+                elseif tile >= 0.20 then
+                    love.graphics.setColor(screenColors[2]) -- Shore
+                elseif tile >= 0.17 then
+                    love.graphics.setColor(screenColors[3]) -- Shallow water
+                elseif tile >= 0.11 then
+                    love.graphics.setColor(screenColors[4]) -- Mid-water
+                else
+                    love.graphics.setColor(screenColors[5]) -- Deep water
+                end
+            elseif screenMode == 1 then
+                love.graphics.setColor(1, 1, 1, math.max(tile,0))
+            elseif screenMode == 2 then
+                love.graphics.setColor(0.2, 0.2, 0.3, math.abs(math.min(tile,0)))
+            elseif screenMode == 3 then
+                if tile > 0 then
+                    love.graphics.setColor(1, 1, 1, math.max(tile,0))
+                elseif tile < 0 then
+                    love.graphics.setColor(0.2, 0.2, 0.3, math.abs(tile))
+                end
             end
 
             love.graphics.rectangle("fill", (x-1) * screenCellSize, (y-1) * screenCellSize, screenCellSize, screenCellSize)
@@ -157,6 +151,6 @@ function love.draw()
     love.graphics.print("Coordinates: " .. math.floor(tx) .. ", " .. math.floor(ty), 2*ww/3, 4*wh/10)
     love.graphics.print("Zoom: " .. math.floor(screenZoom*100), 2*ww/3, 5*wh/10)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 2*ww/3, 6*wh/10)
-    love.graphics.print("WASD to move, U and I to zoom, O and P to change quality", 2*ww/3, 7*wh/10)
-    love.graphics.print('"You may encounter an obvious pattern.\nRestart the program if you hate it"', 2*ww/3, 8*wh/10)
+    love.graphics.print("WASD to move, U and I to zoom, O and P to change quality, \nSPACE to change mode", 2*ww/3, 7*wh/10)
+    love.graphics.print('This has a horrible flaw, I hate it.', 2*ww/3, 8*wh/10)
 end
