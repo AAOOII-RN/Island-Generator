@@ -24,7 +24,7 @@ end
 
 function love.load()
     ww, wh = love.window.getMode()
-    randoms = 2
+    randoms = 3
     offset = {}
     amp = {}
     do_once = false
@@ -69,9 +69,9 @@ function love.update(dt)
     end
     
     -- ZOOM
-    if kd("u") then -- Zoom out
+    if kd("u") then -- Zoom in
         screenZoom = screenZoom - 0.1 * dt
-    elseif kd("i") then -- Zoom in
+    elseif kd("i") then -- Zoom out
         screenZoom = screenZoom + 0.1 * dt
     end
     
@@ -88,8 +88,16 @@ function love.update(dt)
                 ty-screenZoom*(y-screenQuality/2),
                 2
             )
+            local c = hillNoise(
+                tx-screenZoom*(x-screenQuality/2),
+                ty-screenZoom*(y-screenQuality/2),
+                3
+            )
             
-            noise =  a * b
+            noise =  (a + b + c) / 3
+            -- 3 hill noises are enough to make a decent generation
+            -- use a*b*c for singular islands
+            -- but damn, (a + b + c) / 3 is so beautiful
             screen[y][x] = noise
         end
     end
