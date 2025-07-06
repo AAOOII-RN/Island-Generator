@@ -11,9 +11,10 @@
 5. Enjoy 😁
 
 ## Controls 🕹
-- WASD to move
-- U to zoom in, I to zoom out
-- O to decrease quality, P to increase quality
+- **WASD** to move
+- **U** to zoom in, **I** to zoom out
+- **O** to decrease the quality, **P** to increase the quality
+- **Space** to switch modes
 ###### (The controls are meant for you to use both of your hands 😁😁)
 
 ## Best Pics 📸
