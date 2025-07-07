@@ -23,12 +23,12 @@ function Noise:hillNoise(x, y, n)
         self.do_once = true
     end
 
-    xv = {}
-    yv = {}
+    v = {}
     for i = 1, 6 do
-        xv[math.ceil(i/2)] = x*self.amp[n][math.ceil(i/2)*2-1]+self.offset[n][math.ceil(i/2)*2-1]*self.wlen[n][math.ceil(i/2)*2-1]
-        yv[math.ceil(i/2)] = y*self.amp[n][math.ceil(i/2)*2]+self.offset[n][math.ceil(i/2)*2]*self.wlen[n][math.ceil(i/2)*2-1]
+        local x2 = x*self.amp[n][math.ceil(i/2)*2-1]+self.offset[n][math.ceil(i/2)*2-1]*self.wlen[n][math.ceil(i/2)*2-1]
+        local y2 = y*self.amp[n][math.ceil(i/2)*2]+self.offset[n][math.ceil(i/2)*2]*self.wlen[n][math.ceil(i/2)*2-1]
+        v[math.ceil(i/2)] = math.sin(x2 + y2)
     end
 
-    return math.sin(xv[1] + yv[1]) * math.sin(xv[2] + yv[2]) * math.sin(xv[3] + yv[3])
+    return v[1] * v[2] * v[3]
 end
