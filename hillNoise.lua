@@ -25,9 +25,10 @@ function Noise:hillNoise(x, y, n)
 
     v = {}
     for i = 1, 6 do
-        local x2 = x*self.amp[n][math.ceil(i/2)*2-1]+self.offset[n][math.ceil(i/2)*2-1]*self.wlen[n][math.ceil(i/2)*2-1]
-        local y2 = y*self.amp[n][math.ceil(i/2)*2]+self.offset[n][math.ceil(i/2)*2]*self.wlen[n][math.ceil(i/2)*2-1]
-        v[math.ceil(i/2)] = math.sin(x2 + y2)
+        v[math.ceil(i/2)] = math.sin(
+        x*self.amp[n][math.ceil(i/2)*2-1]+self.offset[n][math.ceil(i/2)*2-1]*self.wlen[n][math.ceil(i/2)*2-1] + 
+        y*self.amp[n][math.ceil(i/2)*2]+self.offset[n][math.ceil(i/2)*2]*self.wlen[n][math.ceil(i/2)*2]
+    ) -- X and Y have similar sturctures
     end
 
     return v[1] * v[2] * v[3]
