@@ -5,7 +5,7 @@ function love.load()
     math.randomseed(os.clock())
     ww, wh = love.window.getMode()
 
-    hillnoise = Noise(3)
+    hillnoise = Noise(5)
 
     screen = {}
     screenQuality = 128
@@ -53,27 +53,22 @@ function love.update(dt)
     elseif kd("i") then -- Zoom out
         screenZoom = screenZoom + 0.1 * dt
     end
-    
     for y = 1, screenQuality do
+        local noises = {}
         screen[y] = {}
         for x = 1, screenQuality do
-            local a = hillnoise:hillNoise(
-                tx-screenZoom*(x-screenQuality/2), -- Idk how either of these works...
-                ty-screenZoom*(y-screenQuality/2),
-                1
-            )
-            local b = hillnoise:hillNoise(
-                tx-screenZoom*(x-screenQuality/2),
-                ty-screenZoom*(y-screenQuality/2),
-                2
-            )
-            local c = hillnoise:hillNoise(
-                tx-screenZoom*(x-screenQuality/2),
-                ty-screenZoom*(y-screenQuality/2),
-                3
-            )
-            
-            noise =  (a + b + c) / 3
+            for i = 1, hillnoise.randoms do
+                noises[i] = hillnoise:hillNoise(
+                    tx-screenZoom*(x-screenQuality/2), -- Idk how either of these works...
+                    ty-screenZoom*(y-screenQuality/2),
+                    i
+                )
+            end
+            noise = 0
+            for n = 1, #noises do -- I used Copilot for this. Sorry, guysz.
+                noise = noise + noises[n]
+            end
+            noise = noise / #noises
             -- 3 hill noises are enough to make a decent generation
             -- use a*b*c for singular islands
             -- but damn, (a + b + c) / 3 is so beautiful
