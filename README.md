@@ -1,6 +1,7 @@
 # 🏝Island Generator 🏝
 - Made with [LÖVE](https://love2d.org) framework.
 - Generated using noise, which is constructed with a product of three sine functions with irrational numbers.
+- Other uses of this noise (HillNoise / Sinusoidal Noise): [Cloudy Skies](https://github.com/AAOOII-RN/Cloudy-Skies)
 
 ## How do I open this?
 1. Download [LÖVE](https://love2d.org)
